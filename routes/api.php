@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AuthController;
 // Public (tanpa token)
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 
 // Protected (harus login)
 Route::middleware('auth:sanctum')->group(function () {

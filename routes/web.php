@@ -2,15 +2,28 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 
-// [WAJIB] Route verifikasi email
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill(); // tandai sebagai terverifikasi
-    return response()->json(['message' => 'Email berhasil diverifikasi']);
-})->middleware(['auth', 'signed'])->name('verification.verify');
+// Route verifikasi email
+Route::get('/email/verify/{id}/{hash}', function ($id, $hash, Request $request) {
+    $user = User::findOrFail($id);
 
-// [Opsional] Kirim ulang email verifikasi
+    // Validasi hash sama seperti Laravel bawaan
+    if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        abort(403, 'Invalid verification link');
+    }
+
+    if ($user->hasVerifiedEmail()) {
+        return response()->json(['message' => 'Email sudah terverifikasi']);
+    }
+
+    $user->markEmailAsVerified();
+
+    return view('email-verified');
+})->middleware(['signed'])->name('verification.verify');
+
+// Kirim ulang email verifikasi
 Route::post('/email/verification-notification', function (Request $request) {
     $request->user()->sendEmailVerificationNotification();
     return response()->json(['message' => 'Link verifikasi dikirim ulang']);
