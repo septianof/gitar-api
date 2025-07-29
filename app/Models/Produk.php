@@ -21,4 +21,9 @@ class Produk extends Model
     {
         return $this->hasMany(ProdukFoto::class);
     }
+
+    public function fotoUtama()
+    {
+        return $this->hasOne(ProdukFoto::class)->oldest(); // Ambil foto pertama
+    }
 }

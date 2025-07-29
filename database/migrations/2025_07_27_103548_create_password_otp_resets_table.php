@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->string('identifier'); // bisa email atau nomor HP
             $table->enum('via', ['email', 'whatsapp']); // asal OTP
             $table->string('otp'); // kode OTP (6 digit)
-
+            $table->string('reset_token')->nullable()->unique();
             $table->timestamp('expired_at'); // kapan OTP kadaluarsa
             $table->timestamp('verified_at')->nullable(); // kapan OTP diverifikasi
 
