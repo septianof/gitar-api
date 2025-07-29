@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
@@ -34,12 +33,15 @@ class AuthController extends Controller
         $user->sendEmailVerificationNotification();
 
         return response()->json([
-            'message' => 'Registrasi berhasil, verifikasi email dikirim',
-            'user' => $user
+            'success' => true,
+            'message' => 'Registrasi berhasil. Verifikasi email telah dikirim.',
+            'data' => [
+                'user' => $user
+            ]
         ], 201);
     }
 
-    // Login & Ambil Token
+    // Login Customer
     public function login(Request $request)
     {
         $request->validate([
@@ -51,59 +53,38 @@ class AuthController extends Controller
 
         if (! $user) {
             return response()->json([
-                'message' => 'Email tidak ditemukan',
-                'debug' => 'User null'
+                'success' => false,
+                'message' => 'Email tidak ditemukan.'
             ], 404);
         }
 
         if (! Hash::check($request->password, $user->password)) {
             return response()->json([
-                'message' => 'Password salah',
-                'debug' => 'Hash check gagal'
+                'success' => false,
+                'message' => 'Password salah.'
             ], 401);
         }
 
-        // Generate token
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Login berhasil',
-            'token' => $token,
-            'user' => $user
+            'success' => true,
+            'message' => 'Login berhasil.',
+            'data' => [
+                'token' => $token,
+                'user' => $user
+            ]
         ]);
     }
 
-    // Logout & hapus token
+    // Logout Customer
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => 'Logout berhasil'
+            'success' => true,
+            'message' => 'Logout berhasil.'
         ]);
-    }
-
-    // Lupa Password 
-    public function forgotPassword(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email|exists:users,email',
-        ]);
-
-        // Kirim link reset password
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-        if ($status === Password::RESET_LINK_SENT) {
-            return response()->json([
-                'message' => 'Link reset password telah dikirim ke email Anda.'
-            ], 200);
-        }
-
-        return response()->json([
-            'message' => 'Gagal mengirim link reset password.',
-            'debug' => __($status)
-        ], 500);
     }
 }

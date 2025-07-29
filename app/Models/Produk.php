@@ -12,12 +12,12 @@ class Produk extends Model
 
     protected $fillable = ['nama', 'kategori', 'deskripsi'];
 
-    public function varianProduks()
+    public function varianProduk()
     {
         return $this->hasMany(VarianProduk::class);
     }
 
-    public function produkFotos()
+    public function produkFoto()
     {
         return $this->hasMany(ProdukFoto::class);
     }

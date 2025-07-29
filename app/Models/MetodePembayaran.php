@@ -12,7 +12,7 @@ class MetodePembayaran extends Model
 
     protected $fillable = ['tipe', 'nama', 'nomor', 'gambar'];
 
-    public function pesanans()
+    public function pesanan()
     {
         return $this->hasMany(Pesanan::class);
     }

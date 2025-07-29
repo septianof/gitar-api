@@ -26,12 +26,12 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $hidden = ['password'];
 
-    public function keranjangs()
+    public function keranjang()
     {
         return $this->hasMany(Keranjang::class);
     }
 
-    public function pesanans()
+    public function pesanan()
     {
         return $this->hasMany(Pesanan::class);
     }

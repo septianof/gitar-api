@@ -12,28 +12,30 @@ use App\Models\PasswordOtpReset;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
-
 class ForgotPasswordController extends Controller
 {
-    // Generate Otp
+    // Kirim OTP ke email atau WhatsApp
     public function requestOtp(Request $request)
     {
         $request->validate([
-            'identifier' => 'required|string',
+            'identifier' => 'required|string', // email atau no_hp
         ]);
 
         $identifier = $request->identifier;
 
-        // Deteksi jenis pengiriman: email atau whatsapp
+        // Deteksi jenis tujuan: email atau whatsapp
         if (filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
             $via = 'email';
         } elseif (preg_match('/^[0-9]{9,15}$/', $identifier)) {
             $via = 'whatsapp';
         } else {
-            return response()->json(['message' => 'Format tidak valid'], 422);
+            return response()->json([
+                'success' => false,
+                'message' => 'Format identifier tidak valid. Harus email atau nomor HP.'
+            ], 422);
         }
 
-        // Generate OTP
+        // Generate OTP 6 digit
         $otp = random_int(100000, 999999);
 
         // Simpan ke database
@@ -44,7 +46,7 @@ class ForgotPasswordController extends Controller
             'expired_at' => now()->addMinutes(5),
         ]);
 
-        // Kirim OTP
+        // Kirim OTP via Email atau WhatsApp
         if ($via === 'email') {
             Mail::raw("Kode OTP Anda: $otp", function ($message) use ($identifier) {
                 $message->to($identifier)->subject('OTP Reset Password');
@@ -53,16 +55,19 @@ class ForgotPasswordController extends Controller
             Http::withHeaders([
                 'Authorization' => env('FONNTE_TOKEN'),
             ])->post('https://api.fonnte.com/send', [
-                'target' => $identifier, // nomor tujuan, contoh: 6281234567890
+                'target' => $identifier,
                 'message' => "Kode OTP Anda: $otp",
-                'countryCode' => '62', // opsional, jika `target` tidak pakai awalan 62
+                'countryCode' => '62',
             ]);
         }
 
-        return response()->json(['message' => "OTP dikirim via $via"], 200);
+        return response()->json([
+            'success' => true,
+            'message' => "OTP berhasil dikirim via $via"
+        ]);
     }
 
-    // Verifikasi Otp
+    // Verifikasi OTP
     public function verifyOtp(Request $request)
     {
         $request->validate([
@@ -70,37 +75,50 @@ class ForgotPasswordController extends Controller
             'otp' => 'required|string|size:6',
         ]);
 
+        // Ambil OTP record terbaru berdasarkan identifier dan otp
         $otpRecord = PasswordOtpReset::where('identifier', $request->identifier)
             ->where('otp', $request->otp)
             ->latest()
             ->first();
 
         if (!$otpRecord) {
-            return response()->json(['message' => 'OTP salah atau tidak ditemukan'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP salah atau tidak ditemukan'
+            ], 404);
         }
 
         if ($otpRecord->isExpired()) {
-            return response()->json(['message' => 'OTP sudah kadaluarsa'], 422);
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP sudah kedaluwarsa'
+            ], 422);
         }
 
         if ($otpRecord->isVerified()) {
-            return response()->json(['message' => 'OTP sudah digunakan'], 422);
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP sudah digunakan'
+            ], 422);
         }
 
-        // Tandai sebagai diverifikasi dan buat token
+        // Tandai OTP sebagai diverifikasi dan generate reset_token (UUID)
         $resetToken = Str::uuid();
         $otpRecord->update([
             'verified_at' => now(),
-            'otp' => $resetToken, // timpa OTP jadi token
+            'otp' => $resetToken, // Timpa OTP dengan token
         ]);
 
         return response()->json([
-            'message' => 'OTP terverifikasi',
-            'reset_token' => $resetToken
+            'success' => true,
+            'message' => 'OTP berhasil diverifikasi',
+            'data' => [
+                'reset_token' => $resetToken
+            ]
         ]);
     }
 
-    // Reset Password
+    // Reset password dengan token
     public function resetPassword(Request $request)
     {
         $request->validate([
@@ -108,33 +126,46 @@ class ForgotPasswordController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        // Cari berdasarkan token (di kolom OTP yang sudah ditimpa)
+        // Cari token (disimpan di kolom `otp` setelah diverifikasi)
         $otpRecord = PasswordOtpReset::where('otp', $request->reset_token)->first();
 
         if (!$otpRecord || !$otpRecord->isVerified()) {
-            return response()->json(['message' => 'Token tidak valid'], 403);
+            return response()->json([
+                'success' => false,
+                'message' => 'Token tidak valid atau belum diverifikasi'
+            ], 403);
         }
 
         if ($otpRecord->isExpired()) {
-            return response()->json(['message' => 'Token sudah kadaluarsa'], 422);
+            return response()->json([
+                'success' => false,
+                'message' => 'Token sudah kedaluwarsa'
+            ], 422);
         }
 
-        // Temukan user dari identifier
+        // Cari user berdasarkan email / no_hp dari OTP record
         $user = User::where('email', $otpRecord->identifier)
             ->orWhere('no_hp', $otpRecord->identifier)
             ->first();
 
         if (!$user) {
-            return response()->json(['message' => 'User tidak ditemukan'], 404);
+            return response()->json([
+                'success' => false,
+                'message' => 'User tidak ditemukan'
+            ], 404);
         }
 
+        // Update password
         $user->update([
             'password' => Hash::make($request->password)
         ]);
 
-        // Bersihkan semua entri OTP milik user ini
+        // Hapus semua OTP record milik identifier tersebut
         PasswordOtpReset::where('identifier', $otpRecord->identifier)->delete();
 
-        return response()->json(['message' => 'Password berhasil direset. Silakan login.']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Password berhasil direset. Silakan login.'
+        ]);
     }
 }

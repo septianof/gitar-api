@@ -17,12 +17,12 @@ class VarianProduk extends Model
         return $this->belongsTo(Produk::class);
     }
 
-    public function keranjangs()
+    public function keranjang()
     {
         return $this->hasMany(Keranjang::class);
     }
 
-    public function detailPesanans()
+    public function detailPesanan()
     {
         return $this->hasMany(DetailPesanan::class);
     }

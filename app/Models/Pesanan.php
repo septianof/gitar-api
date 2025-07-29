@@ -23,7 +23,7 @@ class Pesanan extends Model
         return $this->belongsTo(MetodePembayaran::class);
     }
 
-    public function detailPesanans()
+    public function detailPesanan()
     {
         return $this->hasMany(DetailPesanan::class);
     }
