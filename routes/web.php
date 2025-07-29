@@ -5,7 +5,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-// Route verifikasi email
+// Verifikasi email
 Route::get('/email/verify/{id}/{hash}', function ($id, $hash, Request $request) {
     $user = User::findOrFail($id);
 
@@ -22,9 +22,3 @@ Route::get('/email/verify/{id}/{hash}', function ($id, $hash, Request $request) 
 
     return view('email-verified');
 })->middleware(['signed'])->name('verification.verify');
-
-// Kirim ulang email verifikasi
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-    return response()->json(['message' => 'Link verifikasi dikirim ulang']);
-})->middleware(['auth'])->name('verification.send');

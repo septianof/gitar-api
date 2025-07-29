@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\Pesanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProdukController;
-use App\Http\Controllers\API\PesananController;
-use App\Http\Controllers\API\KeranjangController;
+use App\Http\Controllers\Api\PesananController;
+use App\Http\Controllers\Api\KeranjangController;
 use App\Http\Controllers\Api\ForgotPasswordController;
 
 // Public (tanpa token)
@@ -35,4 +35,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/pesanan/{id}', [PesananController::class, 'show']);
     Route::post('/pesanan', [PesananController::class, 'store']);
     Route::post('/pesanan/{id}/bayar', [PesananController::class, 'bayar']);
+
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::put('/profile', [ProfileController::class, 'update']);
+    Route::post('/email/verification-notification', [ProfileController::class, 'resendVerification']);
+    Route::put('/change-password', [ProfileController::class, 'changePassword'])->middleware('auth:sanctum');
 });
