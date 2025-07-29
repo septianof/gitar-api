@@ -25,6 +25,13 @@ class PesananController extends Controller
         $totalHarga = 0;
         $detailItems = [];
 
+        if (!$request->user()->hasVerifiedEmail()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email Anda belum diverifikasi. Silakan verifikasi terlebih dahulu.'
+            ], 403);
+        }
+
         foreach ($request->items as $item) {
             $varian = VarianProduk::find($item['varian_produk_id']);
 
@@ -80,6 +87,56 @@ class PesananController extends Controller
             'data' => [
                 'pesanan_id' => $pesanan->id,
                 'status' => $status
+            ]
+        ]);
+    }
+
+    // Melakukan Pembayaran
+    public function bayar(Request $request, $id)
+    {
+        $request->validate([
+            'bukti_pembayaran' => 'required|image|mimes:jpg,jpeg,png|max:2048'
+        ]);
+
+        $pesanan = Pesanan::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->first();
+
+        if (!$pesanan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan tidak ditemukan'
+            ], 404);
+        }
+
+        if ($pesanan->status !== 'menunggu_pembayaran') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan tidak memerlukan pembayaran atau sudah dibayar'
+            ], 422);
+        }
+
+        if ($pesanan->metodePembayaran->tipe === 'cod') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan dengan metode COD tidak memerlukan bukti pembayaran'
+            ], 422);
+        }
+
+        // Upload file ke folder bukti_pembayaran
+        $path = $request->file('bukti_pembayaran')->store('bukti_pembayaran', 'public');
+
+        // Update pesanan
+        $pesanan->update([
+            'bukti_pembayaran' => $path,
+            'status' => 'menunggu_konfirmasi'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Bukti pembayaran berhasil diunggah. Pesanan akan segera diproses.',
+            'data' => [
+                'bukti_pembayaran_url' => asset('storage/' . $path)
             ]
         ]);
     }

@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\Pesanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProdukController;
+use App\Http\Controllers\API\PesananController;
 use App\Http\Controllers\API\KeranjangController;
 use App\Http\Controllers\Api\ForgotPasswordController;
 
@@ -28,4 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/keranjang', [KeranjangController::class, 'store']);
     Route::put('/keranjang/{id}', [KeranjangController::class, 'update']);
     Route::delete('/keranjang/{id}', [KeranjangController::class, 'destroy']);
+
+    Route::post('/pesanan', [PesananController::class, 'store']);
+    Route::post('/pesanan/{id}/bayar', [PesananController::class, 'bayar']);
 });

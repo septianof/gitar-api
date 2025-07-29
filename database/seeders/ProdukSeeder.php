@@ -11,11 +11,17 @@ class ProdukSeeder extends Seeder
 {
     public function run(): void
     {
-        // Tambahkan 1 produk contoh
+        // Tambahkan produk contoh
         $produk = Produk::create([
             'nama' => 'Gitar Akustik Yamaha F310',
             'kategori' => 'Akustik',
             'deskripsi' => 'Gitar akustik berkualitas untuk pemula hingga menengah.',
+        ]);
+
+        $produk = Produk::create([
+            'nama' => 'Gitar Elektrik Scorpion SS120',
+            'kategori' => 'Elektrik',
+            'deskripsi' => 'Gitar elektrik berkualitas untuk pemula hingga menengah.',
         ]);
 
         // Tambahkan varian untuk produk tersebut
@@ -24,13 +30,28 @@ class ProdukSeeder extends Seeder
                 'produk_id' => $produk->id,
                 'varian' => 'Natural',
                 'harga' => 1500000,
-                'stok' => 10,
+                'stok' => 25,
             ],
             [
                 'produk_id' => $produk->id,
                 'varian' => 'Hitam',
                 'harga' => 1550000,
-                'stok' => 8,
+                'stok' => 25,
+            ],
+        ]);
+
+        VarianProduk::insert([
+            [
+                'produk_id' => $produk->id,
+                'varian' => 'Blue',
+                'harga' => 1500000,
+                'stok' => 25,
+            ],
+            [
+                'produk_id' => $produk->id,
+                'varian' => 'White',
+                'harga' => 1550000,
+                'stok' => 25,
             ],
         ]);
 
@@ -38,11 +59,22 @@ class ProdukSeeder extends Seeder
         ProdukFoto::insert([
             [
                 'produk_id' => $produk->id,
-                'gambar' => 'gitar1.jpg',
+                'gambar' => 'yamaha1.jpg',
             ],
             [
                 'produk_id' => $produk->id,
-                'gambar' => 'gitar2.jpg',
+                'gambar' => 'yamaha2.jpg',
+            ],
+        ]);
+
+        ProdukFoto::insert([
+            [
+                'produk_id' => $produk->id,
+                'gambar' => 'scorpion1.jpg',
+            ],
+            [
+                'produk_id' => $produk->id,
+                'gambar' => 'scorpion2.jpg',
             ],
         ]);
     }

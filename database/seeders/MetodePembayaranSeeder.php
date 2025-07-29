@@ -20,7 +20,7 @@ class MetodePembayaranSeeder extends Seeder
             [
                 'tipe' => 'ewallet',
                 'nama' => 'DANA',
-                'nomor' => '0812345678',
+                'nomor' => '081234567891',
                 'gambar' => 'dana.png',
             ],
             [
