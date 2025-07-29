@@ -11,6 +11,54 @@ use App\Http\Controllers\Controller;
 
 class PesananController extends Controller
 {
+    // Lihat Pesanan 
+    public function index(Request $request)
+    {
+        $user = $request->user();
+
+        $query = Pesanan::with('metodePembayaran')
+            ->where('user_id', $user->id);
+
+        // Filter status
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $pesanans = $query->orderByDesc('created_at')->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Daftar pesanan berhasil diambil',
+            'data' => $pesanans
+        ]);
+    }
+
+    // Lihat Detail Pesanan & Pengiriman
+    public function show(Request $request, $id)
+    {
+        $pesanan = Pesanan::with([
+            'metodePembayaran',
+            'detailPesanan.varianProduk.produk',
+            'pengiriman'
+        ])
+            ->where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->first();
+
+        if (!$pesanan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail pesanan berhasil diambil',
+            'data' => $pesanan
+        ]);
+    }
+
     // Buat Pesanan
     public function store(Request $request)
     {

@@ -31,6 +31,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/keranjang/{id}', [KeranjangController::class, 'update']);
     Route::delete('/keranjang/{id}', [KeranjangController::class, 'destroy']);
 
+    Route::get('/pesanan', [PesananController::class, 'index']);
+    Route::get('/pesanan/{id}', [PesananController::class, 'show']);
     Route::post('/pesanan', [PesananController::class, 'store']);
     Route::post('/pesanan/{id}/bayar', [PesananController::class, 'bayar']);
 });
