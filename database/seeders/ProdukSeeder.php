@@ -12,68 +12,70 @@ class ProdukSeeder extends Seeder
     public function run(): void
     {
         // Tambahkan produk contoh
-        $produk = Produk::create([
+        $yamaha = Produk::create([
             'nama' => 'Gitar Akustik Yamaha F310',
             'kategori' => 'Akustik',
             'deskripsi' => 'Gitar akustik berkualitas untuk pemula hingga menengah.',
         ]);
 
-        $produk = Produk::create([
+        $scorpion = Produk::create([
             'nama' => 'Gitar Elektrik Scorpion SS120',
             'kategori' => 'Elektrik',
             'deskripsi' => 'Gitar elektrik berkualitas untuk pemula hingga menengah.',
         ]);
 
-        // Tambahkan varian untuk produk tersebut
+        // Varian untuk Yamaha
         VarianProduk::insert([
             [
-                'produk_id' => $produk->id,
+                'produk_id' => $yamaha->id,
                 'varian' => 'Natural',
                 'harga' => 1500000,
                 'stok' => 25,
             ],
             [
-                'produk_id' => $produk->id,
+                'produk_id' => $yamaha->id,
                 'varian' => 'Hitam',
                 'harga' => 1550000,
                 'stok' => 25,
             ],
         ]);
 
+        // Varian untuk Scorpion
         VarianProduk::insert([
             [
-                'produk_id' => $produk->id,
+                'produk_id' => $scorpion->id,
                 'varian' => 'Blue',
                 'harga' => 1500000,
                 'stok' => 25,
             ],
             [
-                'produk_id' => $produk->id,
+                'produk_id' => $scorpion->id,
                 'varian' => 'White',
                 'harga' => 1550000,
                 'stok' => 25,
             ],
         ]);
 
-        // Tambahkan foto untuk produk tersebut
+        // Foto untuk Yamaha
         ProdukFoto::insert([
             [
-                'produk_id' => $produk->id,
+                'produk_id' => $yamaha->id,
                 'gambar' => 'yamaha1.jpg',
             ],
             [
-                'produk_id' => $produk->id,
+                'produk_id' => $yamaha->id,
                 'gambar' => 'yamaha2.jpg',
             ],
         ]);
 
+        // Foto untuk Scorpion
         ProdukFoto::insert([
             [
-                'produk_id' => $produk->id,
+                'produk_id' => $scorpion->id,
                 'gambar' => 'scorpion1.jpg',
             ],
             [
-                'produk_id' => $produk->id,
+                'produk_id' => $scorpion->id,
                 'gambar' => 'scorpion2.jpg',
             ],
         ]);
