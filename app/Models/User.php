@@ -40,4 +40,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $this->notify(new VerifikasiEmail);
     }
+    
+    // Agar Filament bisa mengambil nama user (name) dari kolom 'nama'
+    public function getNameAttribute(): string
+    {
+        return $this->nama ?? '';
+    }
 }

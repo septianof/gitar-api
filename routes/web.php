@@ -1,9 +1,15 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+
+// Halaman pilih role sebelum login
+Route::get('/', function () {
+    return view('auth.choose-role');
+});
 
 // Verifikasi email
 Route::get('/email/verify/{id}/{hash}', function ($id, $hash, Request $request) {
