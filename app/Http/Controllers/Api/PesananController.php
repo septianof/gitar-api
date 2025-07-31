@@ -188,4 +188,35 @@ class PesananController extends Controller
             ]
         ]);
     }
+    
+    // Konfirmasi Penerimaan Pesanan
+    public function konfirmasiTerima(Request $request, $id)
+    {
+        $pesanan = Pesanan::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->first();
+
+        if (!$pesanan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan tidak ditemukan'
+            ], 404);
+        }
+
+        if ($pesanan->status !== 'dikirim') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pesanan belum dikirim atau sudah selesai'
+            ], 422);
+        }
+
+        $pesanan->update([
+            'status' => 'selesai'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pesanan berhasil dikonfirmasi diterima'
+        ]);
+    }
 }

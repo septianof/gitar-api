@@ -35,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/pesanan/{id}', [PesananController::class, 'show']);
     Route::post('/pesanan', [PesananController::class, 'store']);
     Route::post('/pesanan/{id}/bayar', [PesananController::class, 'bayar']);
+    Route::post('/pesanan/{id}/konfirmasi-terima', [PesananController::class, 'konfirmasiTerima']);
 
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::put('/profile', [ProfileController::class, 'update']);
