@@ -35,7 +35,7 @@ class PesananResource extends Resource
                 Tables\Columns\TextColumn::make('metodePembayaran.nama')->label('Metode Pembayaran')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('total_harga')->money('IDR', true)->sortable(),
                 Tables\Columns\TextColumn::make('status')->sortable(),
-                Tables\Columns\ImageColumn::make('bukti_pembayaran')->label('Bukti Pembayaran')->disk('public'),
+                Tables\Columns\ImageColumn::make('bukti_pembayaran')->label('Bukti Pembayaran')->width(100)->disk('public'),
                 Tables\Columns\TextColumn::make('created_at')->label('Dibuat')->dateTime('d M Y')->sortable(),
             ])
             ->filters([

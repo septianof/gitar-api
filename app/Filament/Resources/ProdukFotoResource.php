@@ -40,7 +40,7 @@ class ProdukFotoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('produk.nama')->label('Produk')->searchable()->sortable(),
-                Tables\Columns\ImageColumn::make('gambar')->label('Gambar')->disk('public'),
+                Tables\Columns\ImageColumn::make('gambar')->width(100)->label('Gambar')->disk('public'),
                 Tables\Columns\TextColumn::make('created_at')->label('Dibuat')->dateTime('d M Y')->sortable(),
             ])
             ->filters([
