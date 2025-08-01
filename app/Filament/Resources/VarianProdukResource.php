@@ -17,7 +17,9 @@ class VarianProdukResource extends Resource
 {
     protected static ?string $model = VarianProduk::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static ?string $navigationGroup = 'Produk';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -51,15 +53,23 @@ class VarianProdukResource extends Resource
             ])
             ->filters([
                 //
+                Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\RestoreAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->modifyQueryUsing(fn (Builder $query) => $query->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]));
     }
 
     public static function getRelations(): array

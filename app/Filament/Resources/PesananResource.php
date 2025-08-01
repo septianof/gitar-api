@@ -16,8 +16,10 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class PesananResource extends Resource
 {
     protected static ?string $model = Pesanan::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?int $navigationGroupSort = 2;
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationGroup = 'Pesanan';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
